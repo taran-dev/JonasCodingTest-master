@@ -19,35 +19,35 @@ namespace WebApi.Controllers
             _companyService = companyService;
             _mapper = mapper;
         }
-        // GET api/<controller>
+        // GET api/company
         public async Task<IEnumerable<CompanyDto>> GetAll()
         {
             var items = await _companyService.GetAllCompanies();
             return _mapper.Map<IEnumerable<CompanyDto>>(items);
         }
 
-        // GET api/<controller>/5
+        // GET api/company/5
         public async Task<CompanyDto> Get(string companyCode)
         {
             var item = await _companyService.GetCompanyByCode(companyCode);
             return _mapper.Map<CompanyDto>(item);
         }
 
-        // POST api/<controller>
+        // POST api/company
         public async Task<bool> Post([FromBody]CompanyInfo value)
         {
             var result = await _companyService.CreateUpdateCompany(value);
             return result;
         }
 
-        // PUT api/<controller>/5
+        // PUT api/company/5
         public async Task<bool> Put(int id, [FromBody] CompanyInfo value)
         {
             var result = await _companyService.CreateUpdateCompany(value);
             return result;
         }
 
-        // DELETE api/<controller>/5
+        // DELETE api/company/1/5
         public async Task<bool> Delete(string siteId, string companyCode)
         {
             var result = await _companyService.DeleteCompany(siteId, companyCode);

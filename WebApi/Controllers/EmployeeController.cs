@@ -22,28 +22,28 @@ namespace WebApi.Controllers
             _employeeService = employeeService;
             _mapper = mapper;
         }
-        // GET api/<controller>
+        // GET api/employee
         public async Task<IEnumerable<EmployeeDto>> GetAll()
         {
             var items = await _employeeService.GetAllEmployees();
             return _mapper.Map<IEnumerable<EmployeeDto>>(items);
         }
 
-        // GET api/<controller>/5
+        // GET api/employee/5
         public async Task<EmployeeDto> Get(string employeeCode)
         {
             var item = await _employeeService.GetEmployeeByCode(employeeCode);
             return _mapper.Map<EmployeeDto>(item);
         }
 
-        // POST api/<controller>
+        // POST api/employee
         public async Task<bool> Post([FromBody] EmployeeInfo value)
         {
             var result = await _employeeService.CreateUpdateEmployee(value);
             return result;
         }
 
-        // PUT api/<controller>/5
+        // PUT api/employee/5
         public async Task<bool> Put(int id, [FromBody] EmployeeInfo value)
         {
             var result = await _employeeService.CreateUpdateEmployee(value);

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using AutoMapper;
 using BusinessLayer.Model.Models;
 using DataAccessLayer.Model.Interfaces;
-using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using System;
 using DataAccessLayer.Model.Models;
-using System.Globalization;
 
 namespace BusinessLayer.Services
 {
@@ -14,40 +14,80 @@ namespace BusinessLayer.Services
     {
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<CompanyService> _logger;
 
-        public CompanyService(ICompanyRepository companyRepository, IMapper mapper)
+        public CompanyService(ICompanyRepository companyRepository, IMapper mapper, ILogger<CompanyService> logger)
         {
             _companyRepository = companyRepository;
             _mapper = mapper;
+            _logger = logger;
         }
+
         public async Task<IEnumerable<CompanyInfo>> GetAllCompanies()
         {
-            var res = await _companyRepository.GetAll();
-            return _mapper.Map<IEnumerable<CompanyInfo>>(res);
+            try
+            {
+                _logger.LogInformation("Fetching all companies");
+                var res = await _companyRepository.GetAll();
+                return _mapper.Map<IEnumerable<CompanyInfo>>(res);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching all companies");
+                throw;
+            }
         }
 
         public async Task<CompanyInfo> GetCompanyByCode(string companyCode)
         {
-            var result = await _companyRepository.GetByCode(companyCode);
-            return _mapper.Map<CompanyInfo>(result);
+            try
+            {
+                _logger.LogInformation($"Fetching company: {0}", companyCode);
+                var result = await _companyRepository.GetByCode(companyCode);
+                return _mapper.Map<CompanyInfo>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while fetching company: {0}", companyCode);
+                throw;
+            }
         }
 
         public async Task<bool> CreateUpdateCompany(CompanyInfo companyInfo)
         {
-            if(companyInfo == null)
+            try
             {
-                return false;
-            }
+                if (companyInfo == null)
+                {
+                    _logger.LogWarning("Company data provided is null. Cannot create or update company");
+                    return false;
+                }
 
-            var company = _mapper.Map<Company>(companyInfo);
-            var result = await _companyRepository.SaveCompany(company);
-            return result;
+                _logger.LogInformation($"Creating or updating company with code: {0}", companyInfo.CompanyCode);
+                var company = _mapper.Map<Company>(companyInfo);
+                var result = await _companyRepository.SaveCompany(company);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while creating or updating company with code: {0}", companyInfo?.CompanyCode);
+                throw;
+            }
         }
 
         public async Task<bool> DeleteCompany(string siteId, string companyCode)
         {
-            var result = await _companyRepository.DeleteCompany(siteId, companyCode);
-            return result;
+            try
+            {
+                _logger.LogInformation($"Deleting company with siteId: {0} and companyCode: {1}", siteId, companyCode);
+                var result = await _companyRepository.DeleteCompany(siteId, companyCode);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while deleting company with siteId: {0} and companyCode: {1}", siteId, companyCode);
+                throw;
+            }
         }
     }
 }
